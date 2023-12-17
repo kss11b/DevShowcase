@@ -8,7 +8,7 @@ Url validation should happen on next endpoint not the python endpoint
 Next features:
 - Regex url validation
 - Temporary error message for invalid urls
-- Generated url card
+- Loading spinner on url card
 - Back-end should gracefully handle not found
 - Enhance home page to have cards for each demo
 - Optimize text field so that the state update is interruptable
