@@ -3,7 +3,6 @@ Notes
 
 Next features:
 - Loading spinner on url card
-- Back-end should gracefully handle not found
-- Optimize text field so that the state update is interruptable
+- Need a better looking Not Found page
 - Memoize separate demos using memo and lazy
 - Implement Alembic to manage db migrations
