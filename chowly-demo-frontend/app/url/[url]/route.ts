@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 export async function GET(request: Request, { params }: { params: { url: string } }) {
-  // TODO: Need to get host info from .env
-  const res = await fetch(`http://chowly-backend-demo:5000/url/${params.url}`, {
+  const res = await fetch(`${process.env.API_URL}/url/${params.url}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

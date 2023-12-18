@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     });
   }
   // TODO: Need to add cancellation token and error handling
-  const res = await fetch(`http://chowly-backend-demo:5000/url`, {
+  const res = await fetch(`${process.env.API_URL}/url`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -19,8 +19,7 @@ export async function POST(request: Request) {
   });
 
   const data = await res.json();
-  // TODO: Need to grab host from env var
-  const fullUrl = `http://localhost:3000/url/${data}`;
+  const fullUrl = `${process.env.HOST_URL}/url/${data}`;
   return Response.json(fullUrl);
 }
 

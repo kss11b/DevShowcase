@@ -1,16 +1,9 @@
 Notes
 ------------
 
-Front end is successfully sending requests to back-end
-Back end is hashing, abridging and returning url
-Url validation should happen on next endpoint not the python endpoint
-
 Next features:
-- Regex url validation
-- Temporary error message for invalid urls
 - Loading spinner on url card
 - Back-end should gracefully handle not found
-- Enhance home page to have cards for each demo
 - Optimize text field so that the state update is interruptable
 - Memoize separate demos using memo and lazy
 - Implement Alembic to manage db migrations

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDeferredValue } from "react";
 import Link from "next/link";
 import UrlCard from "@/components/cards/urlCard";
 
@@ -13,11 +13,6 @@ export default function Url() {
     setError(newError);
   };
 
-  useEffect(() => {
-    setMinifiedUrl("");
-    setError("");
-  }, [url]);
-  console.log("rerender");
   return (
     <>
       {/* FIXME: Home link needs to live a layer above this */}
@@ -48,6 +43,11 @@ export default function Url() {
               value={url}
               onChange={(e) => {
                 setUrl(e.target.value);
+              }}
+              // Removed useEffect in favor of resetting values on focus
+              onFocus={() => {
+                setMinifiedUrl("");
+                setError("");
               }}
               className='mb-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
               id='add-url'
