@@ -16,7 +16,7 @@ on:
 
 env:
   REGISTRY: registry.digitalocean.com/kss11b
-  IMAGE_PREFIX: ChowlyDemo
+  IMAGE_PREFIX: chowly-demo
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
