@@ -40,12 +40,25 @@ jobs:
           password: ${{ env.DOCKER_PASSWORD }}
 
       # Build and push Next.js App Image
-      - name: Build and push Next.js App Image
-        uses: docker/build-push-action@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          context: ./chowly-demo-frontend
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+        - name: Build and push Next.js App Image
+          uses: docker/build-push-action@v2
+          with:
+            context: ./chowly-demo-frontend
+            push: true
+            tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
 
       # Build and push Flask App Image
       - name: Build and push Flask App Image
