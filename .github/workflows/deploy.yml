@@ -56,3 +56,32 @@ jobs:
           context: ./chowly-demo-frontend
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Pull images and restart services on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_SERVER }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Stop and remove the existing containers
+            docker stop back-end || true
+            docker rm back-end || true
+            docker stop front-end || true
+            docker rm front-end || true
+
+            # Remove the existing images
+            docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest || true
+            docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest || true
+
+            # Pull the new images
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
+
+            # (Re)start containers with the new images
+            docker run -d --name back-end --restart unless-stopped ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest
+            docker run -d --name front-end --restart unless-stopped ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
