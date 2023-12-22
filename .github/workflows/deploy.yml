@@ -68,6 +68,29 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Ensure the network exists
+            docker network inspect demo-network >/dev/null 2>&1 || \
+                docker network create demo-network
+
+            # Check if the 'db' container is running
+            if [ $(docker ps -q -f name=db) ]; then
+                echo "Database container 'db' is already running."
+            else
+                # Check if the 'db' container exists
+                if [ $(docker ps -a -q -f name=db) ]; then
+                    echo "Starting existing database container 'db'."
+                    docker start db
+                else
+                    echo "Creating and starting new database container 'db'."
+                    # Create and start the PostgreSQL container
+                    docker run -p 5432:5432 --network demo-network \
+                    -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                    -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+                    -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+                    --name db -d postgres
+                fi
+            fi
+
             # Stop and remove the existing containers
             docker stop back-end || true
             docker rm back-end || true
