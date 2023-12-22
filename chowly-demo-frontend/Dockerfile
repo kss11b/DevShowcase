@@ -20,4 +20,4 @@ RUN npm run build
 
 VOLUME ["/opt/app"]
 
-CMD ["npm run start"]
+RUN npm run start
