@@ -14,7 +14,9 @@ COPY ./ /opt/app/
 
 EXPOSE 80
 
-ARG NODE_ENV
+# ARG NODE_ENV
+
+RUN npm install
 
 RUN npm run build
 
