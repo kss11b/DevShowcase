@@ -12,9 +12,7 @@ ENV NODE_PATH /opt:/opt/app:$NODE_PATH
 
 COPY ./ /opt/app/
 
-EXPOSE 80
-
-# ARG NODE_ENV
+EXPOSE 3000 
 
 RUN npm install
 
