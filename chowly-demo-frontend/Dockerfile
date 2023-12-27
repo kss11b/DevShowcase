@@ -16,6 +16,8 @@ EXPOSE 3000
 
 RUN npm install
 
+RUN npm test
+
 RUN npm run build
 
 VOLUME ["/opt/app"]
