@@ -1,4 +1,3 @@
-// import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -7,7 +6,7 @@ export default function Home() {
       <div className='bg-lime-700 max-w-xs rounded overflow-hidden'>
         <div className='px-10 py-4'>
           <Link href='/url' className='text-gray-200 hover:text-gray-300'>
-            Tiny URL Demo
+            Tiny URL
           </Link>
         </div>
       </div>
