@@ -12,12 +12,14 @@ ENV NODE_PATH /opt:/opt/app:$NODE_PATH
 
 COPY ./ /opt/app/
 
-EXPOSE 80
+EXPOSE 3000 
 
-# ARG NODE_ENV
+RUN npm install
+
+# RUN npm test
 
 RUN npm run build
 
 VOLUME ["/opt/app"]
 
-CMD ["npm run start"]
+CMD ["npm", "run", "start"]

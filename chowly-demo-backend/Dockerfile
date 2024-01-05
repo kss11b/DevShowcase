@@ -2,15 +2,14 @@ FROM python:3.8
 
 WORKDIR /opt/app/
 
-COPY requirements.txt /opt/app/ 
-
+COPY requirements.txt /opt/app/
 RUN pip install -r requirements.txt
 
 COPY . /opt/app/
 
-EXPOSE 80
+EXPOSE 5000
 
-VOLUME ["/opt/app"]
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-CMD ["python", 'run']
-# CMD ["flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT ["docker-entrypoint.sh"]

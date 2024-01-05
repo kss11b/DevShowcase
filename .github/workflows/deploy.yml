@@ -1,0 +1,114 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+      tags:
+        description: "Manually Triggered Build"
+        required: false
+
+env:
+  REGISTRY: registry.digitalocean.com/kss11b
+  IMAGE_PREFIX: chowly-demo
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Login to DigitalOcean Container Registry
+      - name: Login to DigitalOcean Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      # Build and push Flask App Image
+      - name: Build and push Flask App Image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./chowly-demo-backend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest
+
+      # Build and push Next JS App image
+      - name: Build and push Next.js App Image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./chowly-demo-frontend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Pull images and restart services on remote server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_SERVER }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Ensure the network exists
+            docker network inspect demo-network >/dev/null 2>&1 || \
+                docker network create demo-network
+
+            # Check if the 'db' container is running
+            if [ $(docker ps -q -f name=db) ]; then
+                echo "Database container 'db' is already running."
+            else
+                # Check if the 'db' container exists
+                if [ $(docker ps -a -q -f name=db) ]; then
+                    echo "Starting existing database container 'db'."
+                    docker start db
+                else
+                    echo "Creating and starting new database container 'db'."
+                    # Create and start the PostgreSQL container
+                    docker run -p 5432:5432 --network demo-network \
+                    -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+                    -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+                    -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+                    --name db -d postgres
+                fi
+            fi
+
+            # Stop and remove the existing containers
+            docker stop back-end || true
+            docker rm back-end || true
+            docker stop front-end || true
+            docker rm front-end || true
+
+            # Remove the existing images
+            docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest || true
+            docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest || true
+
+            # Pull the new images
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest
+
+            # (Re)start containers with the new images
+            docker run -p 5000:5000 --network demo-network --env-file=/home/ga/.env.prod -d --name back-end --restart unless-stopped ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-back-end:latest
+            docker run -p 3000:3000 --network demo-network --env-file=/home/ga/.env.prod -d --name front-end --restart unless-stopped ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/chowly-front-end:latest

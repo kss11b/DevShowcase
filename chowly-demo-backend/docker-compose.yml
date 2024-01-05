@@ -1,4 +1,4 @@
-version: '3.5'
+version: "3.5"
 services:
   web:
     build: .
@@ -8,20 +8,8 @@ services:
       - "5000:5000"
     volumes:
       - .:/opt/app
-    depends_on:
-      - db
-    networks:
-      - demo-network
-  db:
-    image: postgres
-    ports:
-      - "5432:5432"
     environment:
-      POSTGRES_DB: chowly-demo-db
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: password
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - FLASK_ENV=development
     networks:
       - demo-network
 networks:
