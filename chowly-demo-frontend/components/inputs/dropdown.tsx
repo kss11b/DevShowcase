@@ -3,16 +3,16 @@ import { Menu, Transition } from "@headlessui/react";
 // import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import classnames from "classnames";
 
-type MenuItem = { name: string; value: T };
+type MenuItem<T> = { name: string; value: T };
 
-const SimpleDropdown = ({
+const SimpleDropdown = <T,>({
   name,
   options,
   setValue,
 }: {
   name: string;
-  options: MenuItem[];
-  setValue: (value: MenuItem["value"]) => void;
+  options: MenuItem<T>[];
+  setValue: (value: T) => void;
 }) => {
   return (
     <Menu as='div' className='relative inline-block text-left mx-2'>
@@ -33,7 +33,7 @@ const SimpleDropdown = ({
       >
         <Menu.Items className='absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'>
           <div className='py-1'>
-            {options?.map((option: MenuItem) => (
+            {options?.map((option: MenuItem<T>) => (
               <Menu.Item>
                 {({ active }: { active: boolean }) => (
                   <a

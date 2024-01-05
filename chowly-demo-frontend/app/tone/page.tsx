@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import MusicCardContextManager from "@/components/contextManagers/musicCardContextManager";
 
@@ -10,8 +11,6 @@ export default function Tone() {
       </Link>
       <main className='flex min-h-screen flex-col items-center justify-center p-24'>
         <MusicCardContextManager />
-        {/* <MusicCard context={context} key={generateGUID()} />
-        <MusicCard context={context} key={generateGUID()} /> */}
       </main>
     </>
   );

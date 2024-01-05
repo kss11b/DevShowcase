@@ -8,7 +8,7 @@ type AudioSettings = {
   wave: OscillatorType;
   // frequency: number;
   octave: number;
-  note: keyof Octave;
+  note: string;
 };
 
 enum WaveTypes {
@@ -125,7 +125,7 @@ export default function MusicCard({ context }: { context: AudioContext | null })
           />
           <SimpleDropdown
             name={audioSettings?.note ? String(audioSettings?.note) : "Note"}
-            setValue={(value: keyof Octave) => {
+            setValue={(value: string) => {
               if (audioSettings) {
                 reInitializeAudio(playing, context, { ...audioSettings, note: value }, setAudioSettings);
               }
@@ -162,7 +162,7 @@ const setupAudioContext = (
     const defaultFrequency = 523.3;
     o.type = audioSettings?.wave || WaveTypes.sine;
     // o.frequency.value = audioSettings?.frequency || 440;
-    o.frequency.value = selectedNotes[audioSettings?.note || "C"] || defaultFrequency;
+    o.frequency.value = selectedNotes[(audioSettings?.note as keyof Octave) || "C"] || defaultFrequency;
     o.detune.value = Math.random() * 3;
     o.connect(g);
     g.connect(context.destination);

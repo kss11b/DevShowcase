@@ -12,8 +12,14 @@ import MusicCard from "../cards/musicCard";
 
 // const context = new AudioContext
 
+let audioContext: AudioContext | null = null;
+
+if (typeof window !== "undefined") {
+  audioContext = new window.AudioContext();
+}
+
 const MusicCardContextManager = () => {
-  const [context, setContext] = useState(new AudioContext());
+  const [context, setContext] = useState<AudioContext | null>(audioContext);
   return (
     context && (
       <>
