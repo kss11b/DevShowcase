@@ -32,7 +32,7 @@ def url():
             pass
         return jsonify(short_url)
 
-# This could technically live in the below route, but I'm separating concerns for now
+# This could technically live in the previous route under a separate method, but I'm separating concerns for now
 @app.route('/url/<tiny_url>', methods=['GET'])
 def translate(tiny_url):
     app.logger.info(tiny_url)
@@ -40,12 +40,9 @@ def translate(tiny_url):
         url_entry = URL.query.filter_by(hash=tiny_url).first()
     except ValueError as err:
         app.logger.error(err)
-        # app.logger.info(f"Here is the returned record {url_entry}")
 
-    # app.logger.info('Value before return', url_entry)
     if url_entry is not None:
 
-        # app.logger.info(f"URL found: {url_entry.url}")
         return jsonify(url=url_entry.url)
     else:
         return jsonify(error="URL not found"), 404
