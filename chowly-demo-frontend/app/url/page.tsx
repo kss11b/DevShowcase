@@ -40,6 +40,7 @@ export default function Url() {
           >
             <div className='font-bold text-xl mb-2'>Minify your address.</div>
             <input
+              data-testid='url-input'
               value={url}
               onChange={(e) => {
                 setUrl(e.target.value);
